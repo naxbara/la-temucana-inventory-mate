@@ -1,14 +1,55 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useProducts } from "@/hooks/use-inventory";
+import { StatsCards } from "@/components/inventory/StatsCards";
+import { ProductTable } from "@/components/inventory/ProductTable";
+import { AddProductDialog } from "@/components/inventory/AddProductDialog";
+import { PhotoCaptureDialog } from "@/components/inventory/PhotoCaptureDialog";
+import { MovementDialog } from "@/components/inventory/MovementDialog";
+import { MovementHistory } from "@/components/inventory/MovementHistory";
+import { Loader2 } from "lucide-react";
 
-const Index = () => {
+const InventoryDashboard = () => {
+  const { data: products, isLoading } = useProducts();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="container mx-auto flex items-center justify-between px-4 py-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">La Temucana</h1>
+            <p className="text-sm text-muted-foreground">Sistema de Inventario</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <PhotoCaptureDialog />
+            <MovementDialog />
+            <AddProductDialog />
+          </div>
+        </div>
+      </header>
+
+      {/* Content */}
+      <main className="container mx-auto px-4 py-6 space-y-6">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            <StatsCards products={products || []} />
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <ProductTable products={products || []} />
+              </div>
+              <div>
+                <MovementHistory />
+              </div>
+            </div>
+          </>
+        )}
+      </main>
     </div>
   );
 };
 
-export default Index;
+export default InventoryDashboard;
