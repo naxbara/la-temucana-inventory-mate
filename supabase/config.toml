@@ -2,3 +2,9 @@ project_id = "thmhwikmuwrhtqqgsbat"
 
 [functions.ocr-production]
 verify_jwt = false
+
+[functions.lioren-sync]
+verify_jwt = false
+
+[functions.import-excel]
+verify_jwt = false
