@@ -8,11 +8,16 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Download, Upload, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Download, Upload, Loader2, CheckCircle2, XCircle, Bug } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useProducts } from "@/hooks/use-inventory";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface SyncResult {
   producto: string;
