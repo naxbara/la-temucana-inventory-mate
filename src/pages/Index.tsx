@@ -24,6 +24,12 @@ const InventoryDashboard = () => {
             <p className="text-sm text-muted-foreground">Sistema de Inventario</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            <Link to="/admin">
+              <Button variant="outline" size="sm">
+                <Settings className="mr-2 h-4 w-4" />
+                Admin
+              </Button>
+            </Link>
             <LiorenImportButton />
             <LiorenExportButton />
             <ExcelImportDialog />
