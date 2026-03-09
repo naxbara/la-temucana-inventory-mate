@@ -21,7 +21,9 @@ const InventoryDashboard = () => {
             <h1 className="text-2xl font-bold tracking-tight">La Temucana</h1>
             <p className="text-sm text-muted-foreground">Sistema de Inventario</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <LiorenImportButton />
+            <LiorenExportButton />
             <ExcelImportDialog />
             <PhotoCaptureDialog />
             <MovementDialog />
