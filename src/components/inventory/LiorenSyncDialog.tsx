@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,16 +8,111 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Download, Upload, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Download, Upload, Loader2, CheckCircle2, XCircle, Bug } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useProducts } from "@/hooks/use-inventory";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface SyncResult {
   producto: string;
   status: string;
   stock?: number;
+}
+
+interface DebugResult {
+  url: string;
+  status?: number;
+  body?: string;
+  error?: string;
+}
+
+function LiorenDebugPanel() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [debugData, setDebugData] = useState<{
+    configuredUrl: string;
+    tokenPrefix: string;
+    results: DebugResult[];
+  } | null>(null);
+
+  const runDebug = useCallback(async () => {
+    setIsLoading(true);
+    setDebugData(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("lioren-sync", {
+        body: { action: "debug" },
+      });
+      if (error) throw error;
+      setDebugData(data);
+    } catch (e) {
+      toast.error("Error al ejecutar debug: " + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  return (
+    <Collapsible>
+      <CollapsibleTrigger asChild>
+        <Button variant="ghost" size="sm" className="w-full gap-2 text-muted-foreground">
+          <Bug className="h-3 w-3" />
+          Diagnóstico de conexión
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2 space-y-2">
+        <Button variant="outline" size="sm" className="w-full" onClick={runDebug} disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+              Probando endpoints...
+            </>
+          ) : (
+            "Ejecutar diagnóstico"
+          )}
+        </Button>
+        {debugData && (
+          <div className="rounded-lg border bg-muted/30 p-3 space-y-2 text-xs font-mono">
+            <div>
+              <span className="text-muted-foreground">URL:</span>{" "}
+              <span className="text-foreground">{debugData.configuredUrl}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Token:</span>{" "}
+              <span className="text-foreground">{debugData.tokenPrefix}</span>
+            </div>
+            <div className="max-h-48 overflow-y-auto space-y-1 border-t pt-2">
+              {debugData.results.map((r, i) => (
+                <div
+                  key={i}
+                  className={`p-1.5 rounded ${
+                    r.status === 200 ? "bg-success/10" : "bg-destructive/10"
+                  }`}
+                >
+                  <div className="flex justify-between">
+                    <span className="truncate max-w-[200px]">{r.url.replace(debugData.configuredUrl, "")}</span>
+                    <span className={r.status === 200 ? "text-success" : "text-destructive"}>
+                      {r.status || "ERR"}
+                    </span>
+                  </div>
+                  {r.body && (
+                    <div className="text-muted-foreground truncate mt-0.5">
+                      {r.body.substring(0, 100)}
+                    </div>
+                  )}
+                  {r.error && <div className="text-destructive">{r.error}</div>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
+  );
 }
 
 export function LiorenImportButton() {
@@ -160,6 +255,7 @@ export function LiorenImportButton() {
             </div>
           )}
         </div>
+        <LiorenDebugPanel />
       </DialogContent>
     </Dialog>
   );
@@ -322,6 +418,7 @@ export function LiorenExportButton() {
             </div>
           )}
         </div>
+        <LiorenDebugPanel />
       </DialogContent>
     </Dialog>
   );
