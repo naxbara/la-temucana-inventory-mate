@@ -153,7 +153,7 @@ serve(async (req) => {
         // Try pagination if we got a full page
         while (products.length >= 100 && hasMore && page < 20) {
           page++;
-          const nextUrl = `${LIOREN_API_URL}/productos?rpp=100&pagina=${page}`;
+          const nextUrl = `${LIOREN_API_URL}/productos?rpp=100&page=${page}`;
           const nextResponse = await fetch(nextUrl, { method: "GET", headers });
           if (!nextResponse.ok) break;
           const nextData = await nextResponse.json();
