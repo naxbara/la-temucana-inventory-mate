@@ -21,6 +21,7 @@ const InventoryDashboard = () => {
             <p className="text-sm text-muted-foreground">Sistema de Inventario</p>
           </div>
           <div className="flex items-center gap-2">
+            <ExcelImportDialog />
             <PhotoCaptureDialog />
             <MovementDialog />
             <AddProductDialog />
