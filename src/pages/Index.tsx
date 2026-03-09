@@ -23,7 +23,6 @@ const InventoryDashboard = () => {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <LiorenImportButton />
-            <LiorenExportButton />
             <ExcelImportDialog />
             <PhotoCaptureDialog />
             <MovementDialog />
