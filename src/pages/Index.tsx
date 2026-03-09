@@ -7,7 +7,9 @@ import { MovementDialog } from "@/components/inventory/MovementDialog";
 import { MovementHistory } from "@/components/inventory/MovementHistory";
 import { ExcelImportDialog } from "@/components/inventory/ExcelImportDialog";
 import { LiorenImportButton, LiorenExportButton } from "@/components/inventory/LiorenSyncDialog";
-import { Loader2 } from "lucide-react";
+import { Loader2, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const InventoryDashboard = () => {
   const { data: products, isLoading } = useProducts();
