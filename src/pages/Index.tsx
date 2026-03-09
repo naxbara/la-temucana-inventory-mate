@@ -7,7 +7,9 @@ import { MovementDialog } from "@/components/inventory/MovementDialog";
 import { MovementHistory } from "@/components/inventory/MovementHistory";
 import { ExcelImportDialog } from "@/components/inventory/ExcelImportDialog";
 import { LiorenImportButton, LiorenExportButton } from "@/components/inventory/LiorenSyncDialog";
-import { Loader2 } from "lucide-react";
+import { Loader2, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const InventoryDashboard = () => {
   const { data: products, isLoading } = useProducts();
@@ -22,6 +24,12 @@ const InventoryDashboard = () => {
             <p className="text-sm text-muted-foreground">Sistema de Inventario</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            <Link to="/admin">
+              <Button variant="outline" size="sm">
+                <Settings className="mr-2 h-4 w-4" />
+                Admin
+              </Button>
+            </Link>
             <LiorenImportButton />
             <LiorenExportButton />
             <ExcelImportDialog />
