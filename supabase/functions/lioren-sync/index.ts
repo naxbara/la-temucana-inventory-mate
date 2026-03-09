@@ -16,7 +16,10 @@ interface LiorenProduct {
 }
 
 interface SyncRequest {
-  action: "fetch_products" | "get_warehouses";
+  action: "fetch_products" | "get_warehouses" | "add_stock";
+  productId?: number;
+  quantity?: number;
+  warehouseId?: number;
 }
 
 serve(async (req) => {
