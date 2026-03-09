@@ -6,7 +6,7 @@ import { PhotoCaptureDialog } from "@/components/inventory/PhotoCaptureDialog";
 import { MovementDialog } from "@/components/inventory/MovementDialog";
 import { MovementHistory } from "@/components/inventory/MovementHistory";
 import { ExcelImportDialog } from "@/components/inventory/ExcelImportDialog";
-import { LiorenImportButton } from "@/components/inventory/LiorenSyncDialog";
+import { LiorenImportButton, LiorenExportButton } from "@/components/inventory/LiorenSyncDialog";
 import { Loader2 } from "lucide-react";
 
 const InventoryDashboard = () => {
@@ -23,6 +23,7 @@ const InventoryDashboard = () => {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <LiorenImportButton />
+            <LiorenExportButton />
             <ExcelImportDialog />
             <PhotoCaptureDialog />
             <MovementDialog />
