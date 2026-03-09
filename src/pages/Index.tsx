@@ -5,6 +5,7 @@ import { AddProductDialog } from "@/components/inventory/AddProductDialog";
 import { PhotoCaptureDialog } from "@/components/inventory/PhotoCaptureDialog";
 import { MovementDialog } from "@/components/inventory/MovementDialog";
 import { MovementHistory } from "@/components/inventory/MovementHistory";
+import { ExcelImportDialog } from "@/components/inventory/ExcelImportDialog";
 import { Loader2 } from "lucide-react";
 
 const InventoryDashboard = () => {
