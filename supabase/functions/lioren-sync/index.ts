@@ -112,7 +112,7 @@ serve(async (req) => {
         let hasMore = true;
 
         // First try without any filters
-        const firstUrl = `${LIOREN_API_URL}/productos?rpp=100&pagina=${page}`;
+        const firstUrl = `${LIOREN_API_URL}/productos?rpp=100&page=${page}`;
         console.log("Fetching:", firstUrl);
         response = await fetch(firstUrl, { method: "GET", headers });
 
