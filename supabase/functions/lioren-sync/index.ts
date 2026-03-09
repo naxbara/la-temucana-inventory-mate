@@ -36,7 +36,7 @@ serve(async (req) => {
       throw new Error("Lioren API token not configured");
     }
 
-    const { action } = (await req.json()) as SyncRequest;
+    const { action, productId, quantity, warehouseId } = (await req.json()) as SyncRequest;
 
     const headers = {
       Authorization: `Bearer ${LIOREN_API_TOKEN}`,
@@ -60,6 +60,22 @@ serve(async (req) => {
         response = await fetch(`${LIOREN_API_URL}/bodegas`, { 
           method: "GET",
           headers 
+        });
+        break;
+
+      case "add_stock":
+        if (!productId || quantity === undefined || !warehouseId) {
+          throw new Error("productId, quantity, and warehouseId are required for add_stock");
+        }
+        // POST /stocks - adds stock to a product in a warehouse
+        response = await fetch(`${LIOREN_API_URL}/stocks`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            producto_id: productId,
+            bodega_id: warehouseId,
+            cantidad: quantity,
+          }),
         });
         break;
 

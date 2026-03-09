@@ -165,5 +165,164 @@ export function LiorenImportButton() {
   );
 }
 
-// Export to Lioren is not supported - Lioren API doesn't have a stock update endpoint
-// Stock in Lioren is managed internally through sales/purchases
+export function LiorenExportButton() {
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<SyncResult[] | null>(null);
+  const { data: products } = useProducts();
+
+  const handleExport = async () => {
+    if (!products || products.length === 0) {
+      toast.error("No hay productos para exportar");
+      return;
+    }
+
+    setIsLoading(true);
+    setResults(null);
+
+    try {
+      // First, fetch products from Lioren to get their IDs and current stock
+      const { data: liorenData, error: fetchError } = await supabase.functions.invoke("lioren-sync", {
+        body: { action: "fetch_products" },
+      });
+
+      if (fetchError) throw fetchError;
+      if (liorenData?.error) throw new Error(liorenData.error);
+
+      const liorenProducts = liorenData.data || [];
+      
+      // Create a map of Lioren products by name (lowercase for matching)
+      const liorenMap = new Map<string, { id: number; stock: number }>();
+      for (const lp of liorenProducts) {
+        liorenMap.set(lp.nombre?.toLowerCase(), { id: lp.id, stock: lp.stock || 0 });
+      }
+
+      const exportResults: SyncResult[] = [];
+
+      for (const product of products) {
+        const liorenProduct = liorenMap.get(product.name.toLowerCase());
+        
+        if (!liorenProduct) {
+          exportResults.push({ 
+            producto: product.name, 
+            status: "no encontrado en Lioren" 
+          });
+          continue;
+        }
+
+        const localStock = product.current_stock || 0;
+        const liorenStock = liorenProduct.stock;
+        const delta = localStock - liorenStock;
+
+        if (delta <= 0) {
+          exportResults.push({ 
+            producto: product.name, 
+            status: delta === 0 ? "sin cambios" : "stock Lioren mayor",
+            stock: liorenStock
+          });
+          continue;
+        }
+
+        // Add the difference to Lioren (using warehouse ID 1 as default)
+        const { data, error } = await supabase.functions.invoke("lioren-sync", {
+          body: {
+            action: "add_stock",
+            productId: liorenProduct.id,
+            quantity: delta,
+            warehouseId: 1,
+          },
+        });
+
+        if (error || data?.error) {
+          exportResults.push({ producto: product.name, status: "error" });
+        } else {
+          exportResults.push({ 
+            producto: product.name, 
+            status: `+${delta} añadido`, 
+            stock: localStock 
+          });
+        }
+      }
+
+      setResults(exportResults);
+      const successCount = exportResults.filter((r) => r.status.includes("añadido")).length;
+      toast.success(`${successCount} productos actualizados en Lioren`);
+    } catch (error) {
+      console.error("Lioren export error:", error);
+      toast.error(error instanceof Error ? error.message : "Error al conectar con Lioren");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Upload className="h-4 w-4" />
+          Exportar a Lioren
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Exportar a Lioren</DialogTitle>
+          <DialogDescription>
+            Sincroniza el stock con Lioren. Solo se añadirá stock si el local es mayor al de Lioren.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {!results ? (
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground mb-4">
+                Se comparará el stock de {products?.length || 0} productos con Lioren y se añadirá la diferencia cuando sea necesario.
+              </p>
+              <Button onClick={handleExport} disabled={isLoading || !products?.length}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sincronizando...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Iniciar sincronización
+                  </>
+                )}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="max-h-64 overflow-y-auto border rounded-lg p-2 space-y-1">
+                {results.map((result, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex items-center justify-between text-sm p-2 rounded ${
+                      result.status.includes("añadido") ? "bg-success/10" : 
+                      result.status === "error" ? "bg-destructive/10" : "bg-muted/50"
+                    }`}
+                  >
+                    <span className="font-medium">{result.producto}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {result.status} {result.stock !== undefined && `(${result.stock})`}
+                      </span>
+                      {result.status.includes("añadido") ? (
+                        <CheckCircle2 className="h-4 w-4 text-success" />
+                      ) : result.status === "error" ? (
+                        <XCircle className="h-4 w-4 text-destructive" />
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => setOpen(false)}>
+                Cerrar
+              </Button>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
