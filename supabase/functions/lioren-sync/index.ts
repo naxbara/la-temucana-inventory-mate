@@ -66,12 +66,11 @@ serve(async (req) => {
     if (action === "debug") {
       const urlsToTry = [
         `${LIOREN_API_URL}/whoami`,
+        `${LIOREN_API_URL}/empresa`,
+        `${LIOREN_API_URL}/sucursales`,
         `${LIOREN_API_URL}/productos`,
         `${LIOREN_API_URL}/productos?rpp=10`,
-        `${LIOREN_API_URL}/productos?activo=1`,
         `${LIOREN_API_URL}/bodegas`,
-        `${LIOREN_API_URL}/categorias`,
-        `${LIOREN_API_URL}/stocks`,
       ];
 
       const results: Record<string, unknown>[] = [];
