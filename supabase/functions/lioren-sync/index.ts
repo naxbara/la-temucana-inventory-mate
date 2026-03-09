@@ -16,10 +16,7 @@ interface LiorenProduct {
 }
 
 interface SyncRequest {
-  action: "fetch_products" | "update_stock" | "get_warehouses";
-  productId?: string;
-  quantity?: number;
-  warehouseId?: string;
+  action: "fetch_products" | "get_warehouses";
 }
 
 serve(async (req) => {
@@ -36,7 +33,7 @@ serve(async (req) => {
       throw new Error("Lioren API token not configured");
     }
 
-    const { action, productId, quantity, warehouseId } = (await req.json()) as SyncRequest;
+    const { action } = (await req.json()) as SyncRequest;
 
     const headers = {
       Authorization: `Bearer ${LIOREN_API_TOKEN}`,
@@ -60,22 +57,6 @@ serve(async (req) => {
         response = await fetch(`${LIOREN_API_URL}/bodegas`, { 
           method: "GET",
           headers 
-        });
-        break;
-
-      case "update_stock":
-        if (!productId || quantity === undefined) {
-          throw new Error("productId and quantity are required for update_stock");
-        }
-        // Stock update endpoint - adjust based on actual Lioren docs
-        response = await fetch(`${LIOREN_API_URL}/stock`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            producto_id: productId,
-            cantidad: quantity,
-            bodega_id: warehouseId || 1,
-          }),
         });
         break;
 
