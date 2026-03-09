@@ -255,6 +255,7 @@ export function LiorenImportButton() {
             </div>
           )}
         </div>
+        <LiorenDebugPanel />
       </DialogContent>
     </Dialog>
   );
