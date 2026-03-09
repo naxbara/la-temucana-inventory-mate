@@ -47,8 +47,8 @@ serve(async (req) => {
   }
 
   try {
-    const LIOREN_API_TOKEN = Deno.env.get("LIOREN_API_TOKEN");
-    const LIOREN_API_URL = Deno.env.get("LIOREN_API_URL") || "https://www.lioren.cl/api";
+    const LIOREN_API_TOKEN = Deno.env.get("LIOREN_API_TOKEN")?.trim();
+    const LIOREN_API_URL = (Deno.env.get("LIOREN_API_URL") || "https://www.lioren.cl/api").trim();
 
     if (!LIOREN_API_TOKEN) {
       throw new Error("Lioren API token not configured");
