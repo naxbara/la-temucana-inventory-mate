@@ -65,13 +65,12 @@ serve(async (req) => {
     // Debug action: try multiple URL patterns and return raw responses
     if (action === "debug") {
       const urlsToTry = [
+        `${LIOREN_API_URL}/whoami`,
         `${LIOREN_API_URL}/productos`,
         `${LIOREN_API_URL}/productos?rpp=10`,
         `${LIOREN_API_URL}/productos?activo=1`,
-        `${LIOREN_API_URL}/producto`,
-        `${LIOREN_API_URL}/products`,
-        `${LIOREN_API_URL}/inventario`,
-        `${LIOREN_API_URL}/stock`,
+        `${LIOREN_API_URL}/bodegas`,
+        `${LIOREN_API_URL}/categorias`,
         `${LIOREN_API_URL}/stocks`,
       ];
 
